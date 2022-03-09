@@ -1,52 +1,55 @@
-/*
- * Copyright (c) 2018-2021, Texas Instruments Incorporated
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * *  Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * *  Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * *  Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-// @cliArgs --board /ti/boards/LP_CC2652RSIP --rtos tirtos
-
-/*
- *  nvsexternal.syscfg
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --board "/ti/boards/LP_CC2652RSIP" --rtos "tirtos" --product "simplelink_cc13xx_cc26xx_sdk@5.40.00.40"
+ * @versions {"tool":"1.10.0+2163"}
  */
 
-/* ======== TIRTOS7 ======== */
-if (system.getRTOS() === "tirtos7") {
-    const tirtos7_release_syscfg_js = system.getScript("tirtos7_release.syscfg.js");
-}
+/**
+ * Import the modules used in this configuration.
+ */
+const Display  = scripting.addModule("/ti/display/Display");
+const Display1 = Display.addInstance();
+const NVS      = scripting.addModule("/ti/drivers/NVS");
+const NVS1     = NVS.addInstance();
 
-/* ======== Display ======== */
-var Display = scripting.addModule("/ti/display/Display");
-var displayUART = Display.addInstance();
-displayUART.$hardware = system.deviceData.board.components.XDS110UART;
+/**
+ * Write custom configuration values to the imported modules.
+ */
+Display1.$name      = "CONFIG_Display_0";
+Display1.$hardware  = system.deviceData.board.components.XDS110UART;
+Display1.uart.$name = "CONFIG_UART2_0";
 
-/* ======== NVS ======== */
-var NVS = scripting.addModule("/ti/drivers/NVS");
-var nvs = NVS.addInstance();
-nvs.$hardware = system.deviceData.board.components.SPI_FLASH;
-nvs.$name = "CONFIG_NVSEXTERNAL";
+NVS1.$hardware           = system.deviceData.board.components.MX25R8035F;
+NVS1.$name               = "CONFIG_NVSEXTERNAL";
+NVS1.externalFlash.$name = "ti_drivers_nvs_NVSSPI25X0";
+
+const CCFG              = scripting.addModule("/ti/devices/CCFG", {}, false);
+CCFG.ccfgTemplate.$name = "ti_devices_CCFGTemplate0";
+
+const NVSSPI25XDevice                         = scripting.addModule("/ti/drivers/nvs/NVSSPI25XDevice", {}, false);
+const NVSSPI25XDevice1                        = NVSSPI25XDevice.addInstance({}, false);
+NVSSPI25XDevice1.$name                        = "CONFIG_NVS_SPI_0";
+NVS1.externalFlash.spiFlashDevice             = NVSSPI25XDevice1;
+NVSSPI25XDevice1.slaveSelectPinInstance.$name = "CONFIG_GPIO_0";
+
+const SPI                          = scripting.addModule("/ti/drivers/SPI", {}, false);
+const SPI1                         = SPI.addInstance({}, false);
+SPI1.$name                         = "CONFIG_SPI_0";
+NVSSPI25XDevice1.sharedSpiInstance = SPI1;
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+Display1.uart.uart.$suggestSolution           = "UART1";
+Display1.uart.uart.txPin.$suggestSolution     = "boosterpack.4";
+Display1.uart.uart.rxPin.$suggestSolution     = "boosterpack.3";
+NVSSPI25XDevice1.slaveSelect.$suggestSolution = "boosterpack.38";
+SPI1.spi.$suggestSolution                     = "SSI0";
+SPI1.spi.sclkPin.$suggestSolution             = "boosterpack.7";
+SPI1.spi.misoPin.$suggestSolution             = "boosterpack.14";
+SPI1.spi.mosiPin.$suggestSolution             = "boosterpack.15";
+SPI1.spi.dmaRxChannel.$suggestSolution        = "DMA_CH3";
+SPI1.spi.dmaTxChannel.$suggestSolution        = "DMA_CH4";
