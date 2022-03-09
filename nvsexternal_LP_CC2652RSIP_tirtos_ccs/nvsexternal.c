@@ -124,6 +124,12 @@ void *mainThread(void *arg0)
          * to performing the write operation. This is specified by
          * NVS_WRITE_ERASE.
          */
+        NVS_erase(nvsHandle, 0, regionAttrs.sectorSize);
+        int i;
+        for (i = 1; i <= 20; i++) {
+            NVS_write(nvsHandle, 0, (void *) signature, i, NVS_WRITE_POST_VERIFY);
+            Display_printf(displayHandle, 0, 0, "Writing %d bytes", i);
+        }
         NVS_write(nvsHandle, 0, (void *) signature, sizeof(signature),
             NVS_WRITE_ERASE | NVS_WRITE_POST_VERIFY);
     }
