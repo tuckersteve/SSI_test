@@ -1,2 +1,6 @@
 .jxbrowser.userdata
 .metadata
+nvsexternal_LP_CC2652RSIP_tirtos_ccs/Debug
+tirtos_builds_cc13x2_cc26x2_release_ccs/Debug
+tirtos_builds_cc13x2_cc26x2_release_ccs/src
+org.eclipse.core.resources.prefs
